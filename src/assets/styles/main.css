@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+    font-family: Indie Flower;
+    src: url('../fonts/IndieFlower-Regular.ttf');
+}
+
 ::-webkit-scrollbar {
     width: 10px;
     @apply bg-zinc-900;

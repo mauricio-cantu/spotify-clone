@@ -8,5 +8,11 @@ svgLoader({
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [vue(), svgLoader()]
+  plugins: [vue({
+    template: {
+      compilerOptions: {
+        isCustomElement: (tag) => tag.indexOf('sign') > -1
+      }
+    }
+  }), svgLoader()]
 })
