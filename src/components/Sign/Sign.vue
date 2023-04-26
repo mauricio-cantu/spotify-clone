@@ -7,7 +7,7 @@ const isActive = ref(false);
 
 <template>
   <div
-    class="flex w-[150px] right-0 fixed translate-x-[74px] justify-between items-center gap-1 p-2 bg-green-600 top-[50%] transition-all rounded-l-full cursor-pointer bg-gradient-to-br from-sky-500 from-10% to-emerald-500 to-90%"
+    class="flex w-[150px] right-0 fixed translate-x-[74px] justify-between items-center gap-1 p-2 bg-green-600 bottom-[166px] lg:bottom-[110px] transition-all rounded-l-full cursor-pointer bg-gradient-to-br from-sky-500 from-10% to-emerald-500 to-90%"
     :class="{ '!translate-x-0': isActive }"
     @click="isActive = !isActive"
     v-on-click-outside="() => { isActive = false }"

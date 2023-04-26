@@ -1,62 +1,49 @@
 <script setup lang="ts">
 /// <reference types="vite-svg-loader" />
 import {
-  PhArrowsInSimple,
-  PhArrowsOutSimple,
   PhBooks,
   PhCaretDown,
   PhCaretLeft,
   PhCaretRight,
-  PhDevices,
   PhHeart,
   PhHouse,
   PhMagnifyingGlass,
-  PhMicrophoneStage,
-  PhPauseCircle,
-  PhPictureInPicture,
-  PhPlay,
-  PhPlayCircle,
   PhPlus,
-  PhQueue,
-  PhRepeat,
-  PhShuffle,
-  PhSkipBack,
-  PhSkipForward,
   PhSpeakerHigh,
 } from "@phosphor-icons/vue";
 import { vOnClickOutside } from "@vueuse/components";
 import { computed, onMounted, onUnmounted, ref } from "vue";
-import LogoIcon from "./assets/img/logo.svg?component";
-import { Sign, ThemeSwitch } from "./components";
-import { CardItem, RecentItem } from "./models";
 import {
-  recentItemsMock,
   dailyItemsMock,
   jumpBackItemsMock,
+  recentItemsMock,
 } from "./assets/data";
+import LogoIcon from "./assets/img/logo.svg?component";
+import {
+  CardsSection,
+  Footer,
+  PlayButton,
+  Sign,
+  ThemeSwitch,
+} from "./components";
 import { getImageUrl } from "./helpers";
+import { CardItem, RecentItem } from "./models";
+import { useUserStore } from "@/store/user";
 
 const isMenuOpen = ref(false);
-const isShuffleActive = ref(false);
-const isRepeatActive = ref(false);
 const scrollValue = ref(0);
 const currentMainBackground = computed<string>(() => getGradientValue());
-const isFullscreenEnabled = ref(false);
-const isPlaying = ref(false);
 const recentItems = ref<RecentItem[]>(recentItemsMock);
 const activeRecentItem = ref<RecentItem | null>(recentItems.value[0]);
 const dailyItems = ref<CardItem[]>(dailyItemsMock);
 const jumpBackItems = ref<CardItem[]>(jumpBackItemsMock);
+const userStore = useUserStore();
 
 const getGradientValue = (): string =>
   `linear-gradient(180deg, ${activeRecentItem.value?.bgColor} -42%, rgba(24,24,27,1) 25%)`;
 
 const updateScroll = (): void => {
   scrollValue.value = window.scrollY;
-};
-
-const toggleFullscreen = (): void => {
-  isFullscreenEnabled.value = !isFullscreenEnabled.value;
 };
 
 onMounted(() => {
@@ -149,80 +136,83 @@ onUnmounted(() => {
       :style="{ background: currentMainBackground }"
     >
       <div
-        class="flex items-center gap-4 p-3 md:p-6 sticky top-0 z-10 transition-colors bg-transparent max-w-screen-2xl mx-auto"
+        class="bg-transparent"
         :class="{ 'shadow-xl bg-zinc-800': scrollValue > 0 }"
       >
-        <button
-          class="hidden lg:block rounded-full p-1 bg-zinc-900 text-white cursor-not-allowed"
+        <div
+          class="flex items-center gap-4 p-3 md:p-6 sticky top-0 z-10 transition-colors max-w-screen-2xl mx-auto"
         >
-          <PhCaretLeft size="24" />
-        </button>
-        <button
-          class="hidden lg:block rounded-full p-1 bg-zinc-900 text-white cursor-not-allowed"
-        >
-          <PhCaretRight size="24" />
-        </button>
+          <button
+            class="hidden lg:block rounded-full p-1 bg-zinc-900 text-white cursor-not-allowed"
+          >
+            <PhCaretLeft size="24" />
+          </button>
+          <button
+            class="hidden lg:block rounded-full p-1 bg-zinc-900 text-white cursor-not-allowed"
+          >
+            <PhCaretRight size="24" />
+          </button>
 
-        <a href="" class="lg:hidden">
-          <LogoIcon class="w-24" />
-        </a>
+          <a href="" class="lg:hidden">
+            <LogoIcon class="w-24" />
+          </a>
 
-        <button
-          class="rounded-full bg-zinc-900 transition ml-auto p-[3px] pr-3 flex items-center gap-2 relative"
-          @click="isMenuOpen = !isMenuOpen"
-          v-on-click-outside="
-            () => {
-              isMenuOpen = false;
-            }
-          "
-        >
-          <img
-            class="h-8 w-8 rounded-full overflow-y-hidden"
-            :src="getImageUrl('me.png')"
-            alt=""
-          />
-
-          <span class="text-white text-sm font-semibold">Maurício Cantú</span>
-
-          <PhCaretDown
-            weight="fill"
-            class="transition-transform duration-300"
-            :class="{ 'rotate-180': isMenuOpen }"
-          />
-          <div
-            class="p-1 bg-zinc-900 absolute top-[30px] w-[200px] rounded right-0 shadow-lg opacity-0 transition duration-300"
-            :class="
-              isMenuOpen ? 'opacity-100 visible translate-y-3' : 'invisible'
+          <button
+            class="rounded-full relative ml-auto bg-zinc-900 transition p-[3px] pr-3 flex items-center gap-2"
+            @click="isMenuOpen = !isMenuOpen"
+            v-on-click-outside="
+              () => {
+                isMenuOpen = false;
+              }
             "
           >
-            <ul>
-              <li
-                class="py-2 px-3 rounded text-sm cursor-default hover:bg-zinc-700 flex items-center"
-              >
-                Account
-              </li>
-              <li
-                class="py-2 px-3 rounded text-sm cursor-default hover:bg-zinc-700 flex items-center"
-              >
-                Profile
-              </li>
-              <li
-                class="py-2 px-3 rounded text-sm cursor-default hover:bg-zinc-700 flex items-center"
-              >
-                Settings
-              </li>
-              <li class="h-[1px] w-full bg-gray-600 my-1"></li>
-              <li
-                class="py-2 px-3 rounded text-sm cursor-default hover:bg-zinc-700 flex items-center"
-              >
-                Log out
-              </li>
-            </ul>
-          </div>
-        </button>
-      </div>
+            <img
+              class="h-8 w-8 rounded-full overflow-y-hidden"
+              :src="userStore.photo"
+              alt=""
+            />
 
-      <div class="px-3 md:px-6 py-3 pb-48 max-w-screen-2xl mx-auto">
+            <span class="text-white text-sm font-semibold">{{ userStore.name }}</span>
+
+            <PhCaretDown
+              weight="fill"
+              class="transition-transform"
+              :class="{ 'rotate-180': isMenuOpen }"
+            />
+            <Transition name="fade">
+              <div
+                class="p-1 bg-zinc-900 absolute top-[41px] w-[200px] rounded right-0 shadow-lg"
+                v-if="isMenuOpen"
+              >
+                <ul>
+                  <li
+                    class="py-2 px-3 rounded text-sm cursor-default hover:bg-zinc-700 flex items-center"
+                  >
+                    Account
+                  </li>
+                  <li
+                    class="py-2 px-3 rounded text-sm cursor-default hover:bg-zinc-700 flex items-center"
+                  >
+                    Profile
+                  </li>
+                  <li
+                    class="py-2 px-3 rounded text-sm cursor-default hover:bg-zinc-700 flex items-center"
+                  >
+                    Settings
+                  </li>
+                  <li class="h-[1px] w-full bg-gray-600 my-1"></li>
+                  <li
+                    class="py-2 px-3 rounded text-sm cursor-default hover:bg-zinc-700 flex items-center"
+                  >
+                    Log out
+                  </li>
+                </ul>
+              </div>
+            </Transition>
+          </button>
+        </div>
+      </div>
+      <div class="px-3 md:px-6 py-3 pb-40 max-w-screen-2xl mx-auto">
         <div class="flex justify-between items-center">
           <h1 class="text-white text-3xl font-bold">Good evening</h1>
           <ThemeSwitch />
@@ -244,234 +234,29 @@ onUnmounted(() => {
                 <img :src="getImageUrl(item.assetUrl)" />
               </div>
               <span class="line-clamp-2">{{ item.title }}</span>
-              <button
-                class="rounded-full duration-300 transition bg-green-500 shadow-lg p-3 mr-5 ml-auto opacity-0 hidden lg:block group-hover:opacity-100 hover:scale-105"
-              >
-                <PhPlay weight="fill" class="text-black" size="23" />
-              </button>
+              <PlayButton
+                icon-size="23"
+                class="transition mr-5 ml-auto opacity-0 hidden lg:block group-hover:opacity-100"
+              />
             </div>
           </div>
         </div>
 
-        <div class="mt-7 mb-6 flex justify-between items-center pr-4">
-          <a href="">
-            <h2 class="text-white text-2xl font-semibold hover:underline">
-              Made for Mauricio Cantú
-            </h2>
-          </a>
-        </div>
+        <CardsSection
+          :cards="dailyItems"
+          :title="`Made for ${userStore.name}`"
+          class="mt-7"
+        />
 
-        <div class="flex items-center gap-5 flex-wrap">
-          <div
-            class="rounded w-48 p-4 flex flex-col gap-3 bg-zinc-800 hover:bg-zinc-700 transition-colors text-white cursor-pointer group"
-            v-for="(item, index) in dailyItems"
-            :key="index"
-          >
-            <div class="rounded overflow-hidden flex-1 relative">
-              <img :src="getImageUrl(item.assetUrl)" />
-              <button
-                class="absolute duration-300 bottom-0.5 right-2 rounded-full transition bg-green-500 p-3 opacity-0 shadow-lg group-hover:opacity-100 hover:scale-105 group-hover:-translate-y-2"
-              >
-                <PhPlay weight="fill" class="text-black" size="21" />
-              </button>
-            </div>
-            <span class="text-white font-semibold line-clamp-1">
-              {{ item.title }}
-            </span>
-            <span v-if="item.subtitle" class="text-gray-300 line-clamp-2">
-              {{ item.subtitle }}
-            </span>
-          </div>
-        </div>
-
-        <div class="mt-7 mb-6 flex justify-between items-center pr-4">
-          <a href="">
-            <h2 class="text-white text-2xl font-semibold hover:underline">
-              Jump back in
-            </h2>
-          </a>
-        </div>
-
-        <div class="flex items-center gap-5 flex-wrap">
-          <div
-            class="rounded w-48 p-4 flex flex-col gap-3 bg-zinc-800 hover:bg-zinc-700 transition-colors text-white cursor-pointer group"
-            v-for="(item, index) in jumpBackItems"
-            :key="index"
-          >
-            <div class="rounded overflow-hidden flex-1 relative">
-              <img :src="getImageUrl(item.assetUrl)" />
-              <button
-                class="absolute duration-300 bottom-0.5 right-2 rounded-full transition bg-green-500 p-3 opacity-0 shadow-lg group-hover:opacity-100 hover:scale-105 group-hover:-translate-y-2"
-              >
-                <PhPlay weight="fill" class="text-black" size="21" />
-              </button>
-            </div>
-            <span class="text-white font-semibold line-clamp-1">
-              {{ item.title }}
-            </span>
-            <span v-if="item.subtitle" class="text-gray-300 line-clamp-2">
-              {{ item.subtitle }}
-            </span>
-          </div>
-        </div>
+        <CardsSection
+          :cards="jumpBackItems"
+          :title="'Jump back in'"
+          class="mt-7"
+        />
       </div>
     </main>
   </div>
-  <footer
-    class="fixed bottom-0 w-full bg-zinc-900 text-white p-2 gap-3 lg:gap-0 lg:p-4 border-t border-neutral-800 flex flex-col lg:flex-row justify-between items-center"
-  >
-    <div class="flex items-center justify-between w-full">
-      <div class="flex items-center gap-3">
-        <img
-          :src="getImageUrl('innerspeaker-album.jpg')"
-          class="rounded-md w-11 h-11 lg:w-14 lg:h-14"
-        />
-        <div class="flex flex-col gap-1 mr-4">
-          <a
-            class="text-white text-sm line-clamp-1 hover:underline cursor-pointer"
-            >Expectation</a
-          >
-          <a class="text-gray-400 text-xs hover:underline cursor-pointer"
-            >Tame Impala</a
-          >
-        </div>
-        <button class="hidden lg:block text-green-600">
-          <PhHeart size="18" weight="fill" />
-        </button>
-        <button class="hidden lg:block text-gray-400 hover:text-white">
-          <PhPictureInPicture size="18" />
-        </button>
-      </div>
-
-      <div
-        class="flex-col gap-2 items-center justify-center w-2/4 hidden lg:flex"
-      >
-        <div class="flex gap-5">
-          <button
-            @click="isShuffleActive = !isShuffleActive"
-            class="text-gray-400"
-            :class="{
-              'text-green-500': isShuffleActive,
-              'hover:text-white': !isShuffleActive,
-            }"
-          >
-            <PhShuffle size="22" />
-          </button>
-
-          <button class="text-gray-400 hover:text-white">
-            <PhSkipBack weight="fill" size="22" />
-          </button>
-
-          <button
-            @click="isPlaying = !isPlaying"
-            class="transition-transform hover:scale-110"
-          >
-            <component
-              :is="isPlaying ? PhPauseCircle : PhPlayCircle"
-              weight="fill"
-              size="40"
-            />
-          </button>
-
-          <button class="text-gray-400 hover:text-white">
-            <PhSkipForward weight="fill" size="22" />
-          </button>
-
-          <button
-            @click="isRepeatActive = !isRepeatActive"
-            class="text-gray-400"
-            :class="{
-              'text-green-500': isRepeatActive,
-              'hover:text-white': !isRepeatActive,
-            }"
-          >
-            <PhRepeat size="22" />
-          </button>
-        </div>
-
-        <div
-          class="flex items-center justify-center gap-3 w-full max-w-screen-lg"
-        >
-          <span class="text-xs text-gray-300">3:42</span>
-          <div class="h-1 w-[70%] bg-gray-700 rounded group">
-            <div
-              class="w-[42%] h-full bg-white rounded group-hover:bg-green-500 relative after:rounded-full after:h-3 after:w-3 after:-top-1 after:-right-1 after:bg-white after:absolute after:invisible group-hover:after:visible"
-            ></div>
-          </div>
-
-          <span class="text-xs text-gray-300">7:51</span>
-        </div>
-      </div>
-
-      <div class="items-center gap-3 hidden lg:flex">
-        <button class="text-gray-400 hover:text-white">
-          <PhMicrophoneStage size="18" />
-        </button>
-        <button class="text-gray-400 hover:text-white">
-          <PhQueue size="18" />
-        </button>
-        <button class="text-gray-400 hover:text-white">
-          <PhDevices size="18" />
-        </button>
-        <button class="text-gray-400 hover:text-white">
-          <PhSpeakerHigh size="18" />
-        </button>
-        <button
-          class="text-gray-400 hover:text-white"
-          @click="toggleFullscreen"
-        >
-          <component
-            :is="isFullscreenEnabled ? PhArrowsInSimple : PhArrowsOutSimple"
-            size="18"
-          />
-        </button>
-      </div>
-      <div class="items-center gap-3 flex lg:hidden">
-        <button class="text-green-600">
-          <PhHeart size="22" weight="fill" />
-        </button>
-        <button class="text-gray-400 hover:text-white">
-          <PhDevices size="22" />
-        </button>
-        <button
-          @click="isPlaying = !isPlaying"
-          class="transition-transform hover:scale-110"
-        >
-          <component
-            :is="isPlaying ? PhPauseCircle : PhPlayCircle"
-            weight="fill"
-            size="40"
-          />
-        </button>
-      </div>
-    </div>
-
-    <div class="h-1 w-full bg-gray-700 rounded group lg:hidden">
-      <div
-        class="w-[42%] h-full bg-white rounded group-hover:bg-green-500 relative after:rounded-full after:h-3 after:w-3 after:-top-1 after:-right-1 after:bg-white after:absolute after:invisible group-hover:after:visible"
-      ></div>
-    </div>
-    <div class="flex items-center justify-around py-1 lg:hidden w-full">
-      <button
-        class="text-white hover:text-white flex flex-col gap-1 items-center"
-      >
-        <PhHouse size="28" />
-        <span class="text-xs">Home</span>
-      </button>
-      <button
-        class="text-gray-400 hover:text-white flex flex-col gap-1 items-center"
-      >
-        <PhMagnifyingGlass size="28" />
-        <span class="text-xs">Search</span>
-      </button>
-      <button
-        class="text-gray-400 hover:text-white flex flex-col gap-1 items-center"
-      >
-        <PhBooks size="28" />
-        <span class="text-xs">Library</span>
-      </button>
-    </div>
-  </footer>
+  <Footer />
   <Sign />
 </template>
 

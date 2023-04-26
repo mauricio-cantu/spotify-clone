@@ -23,6 +23,9 @@ export default {
       },
       animation: {
         point: 'point 1s ease-in-out infinite',
+      },
+      transitionDuration: {
+        DEFAULT: '300ms'
       }
     },
   },
